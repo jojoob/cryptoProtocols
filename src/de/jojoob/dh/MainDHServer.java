@@ -20,9 +20,9 @@ public class MainDHServer {
 		server.continuousRead(new ServerInputProcessor());
 
 		dhServer = new DHHost();
-//		dhServer.generateGPrandom(1024);
+		dhServer.generateGPrandom(1024);
 //		dhServer.generateGPDSALike(1024);
-		dhServer.generateGPsavePrime(1024);
+//		dhServer.generateGPsavePrime(1024);
 		dhServer.generateA();
 
 		server.writeLine(dhServer.getP().toString());
