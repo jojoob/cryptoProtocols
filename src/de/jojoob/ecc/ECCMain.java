@@ -28,10 +28,6 @@ public class ECCMain {
 		System.out.println(g.y.toString(16));
 		System.out.println();
 
-
-		ECC.Point asd = ecc.newPoint(
-				new BigInteger("DAFEBF5828783F2AD35534631588A3F629A70FB16982A888", 16),
-				new BigInteger("DAFEBF5828783F2AD35534631588A3F629A70FB16982A888", 16));
 //		Test Values: http://point-at-infinity.org/ecc/nisttv
 		BigInteger k;
 		for (int i = 1; i < 10; i++) {
