@@ -18,9 +18,14 @@ public class RSA {
 	public void generateKeyPair() {
 		Random random = new Random();
 		BigInteger p = BigInteger.probablePrime(1024, random);
-		BigInteger q = BigInteger.probablePrime(1024, random);
 
-		BigInteger n = p.multiply(q); // Note: multiply two 1024 bit values the result is 2047 or 2048 bit long
+		BigInteger q;
+		BigInteger n;
+		do {
+			q = BigInteger.probablePrime(1024, random);
+			n = p.multiply(q); // Note: multiply two 1024 bit values the result is 2047 or 2048 bit long
+		} while (n.bitLength() != 2048);
+
 		this.n = n;
 
 		BigInteger phin = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
