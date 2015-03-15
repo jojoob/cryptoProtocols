@@ -47,13 +47,14 @@ public class DSA {
 		System.out.println("searching p...");
 		BigInteger p;
 		BigInteger k;
+		int kLength = l - q.bitLength();
 		int i = 0;
 		do {
 			i++;
 			do {
 				do {
-					k = new BigInteger(l - q.bitLength(), random);
-				} while (k.bitLength() == l - q.bitLength());
+					k = new BigInteger(kLength, random);
+				} while (k.bitLength() == kLength);
 				p = k.multiply(q).add(BigInteger.ONE);
 			} while (p.bitLength() == l);
 		} while (!p.isProbablePrime(100));
