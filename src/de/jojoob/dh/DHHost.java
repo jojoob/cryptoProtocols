@@ -22,29 +22,37 @@ public class DHHost {
 		this.g = new BigInteger(p.bitLength(), this.random).mod(p);
 	}
 
-	public void generateGPDSALike(int pLength) {
-		int qLength = 160; // size of subgroup order
+	/**
+	 *
+	 * @param pLength
+	 * @param qLength size of subgroup order
+	 */
+	public void generateGPDSALike(int pLength, int qLength) {
 
 //		choose q (as subgroup order)
 		BigInteger q = BigInteger.probablePrime(qLength, random);
 
-//		calculate p
+//		calculate p with p = k * q + 1 // p - 1 | q
 		BigInteger p;
+		BigInteger k; // do not confuse with this.k
+		int kLength = pLength - q.bitLength();
 		do {
-			p = new BigInteger(pLength, this.random);
-			p = p.subtract(p.subtract(BigInteger.ONE).mod(q));
-		} while (!p.isProbablePrime(100) || p.bitLength() != pLength);
+			do {
+				do {
+					k = new BigInteger(kLength, random);
+				} while (k.bitLength() == kLength);
+				p = k.multiply(q).add(BigInteger.ONE);
+			} while (p.bitLength() == pLength);
+		} while (!p.isProbablePrime(100));
 		this.p = p;
 
-//		calculate g
+//		calculate g with order q
 		BigInteger h;
 		BigInteger g = BigInteger.ONE;
-		BigInteger aux = p.subtract(BigInteger.ONE);
-		BigInteger pow = aux.divide(q);
 		do {
 			h = new BigInteger(p.bitLength(), this.random);
 			if (h.compareTo(BigInteger.ONE) == 1 && h.compareTo(p.subtract(BigInteger.ONE)) == -1) {
-				g = h.modPow(pow, p);
+				g = h.modPow(k, p);
 			}
 		} while (g.compareTo(BigInteger.ONE) == 0);
 		this.g = g;
