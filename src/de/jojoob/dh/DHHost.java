@@ -55,7 +55,7 @@ public class DHHost {
 		BigInteger u;
 		BigInteger p;
 		do {
-			u = BigInteger.probablePrime(pLength, this.random);
+			u = BigInteger.probablePrime(pLength-1, this.random);
 			p = g.multiply(u).add(BigInteger.ONE);
 		} while (!p.isProbablePrime(100));
 		this.p = p;
