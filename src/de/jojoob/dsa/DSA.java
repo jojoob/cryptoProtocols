@@ -3,12 +3,21 @@ package de.jojoob.dsa;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
  * Created by joo on 19.02.15.
  */
+// DSA Standard: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 public class DSA {
+
+	MessageDigest messageDigest;
+
+//	Bit length of p
+	private int l;
+//	Bit length of q
+	private int n;
 
 //	public key
 	private BigInteger p;
@@ -19,37 +28,46 @@ public class DSA {
 //	private key
 	private BigInteger x;
 
+	public DSA() throws NoSuchAlgorithmException {
+		this.messageDigest = MessageDigest.getInstance("SHA-256");
+		this.l = 2048;
+		this.n = 256;
+//		other value combinations and hash functions are valid to: 1024/160, 2048/224, 2048/256, 3072/256
+//		but consider if n is lower than bit length of used hash function, hash must cut to fit n
+	}
+
 	public void generateKeyPair() {
 		Random random = new Random();
-		int l = 512;
 
 //		calculate q
-		BigInteger q = BigInteger.probablePrime(160, random);
+		BigInteger q = BigInteger.probablePrime(n, random);
 		this.q = q;
 
-//		calculate p
+//		calculate p with p = k * q + 1 // p - 1 | q
 		System.out.println("searching p...");
 		BigInteger p;
+		BigInteger k;
 		int i = 0;
 		do {
 			i++;
-			p = new BigInteger(l, random);
-//			p = BigInteger.probablePrime(l, random); // we need less rounds but it takes longer to generate a prime number
-			p = p.subtract(p.subtract(BigInteger.ONE).mod(q));
-		} while (!p.isProbablePrime(100) || p.bitLength() != l);
+			do {
+				do {
+					k = new BigInteger(l - q.bitLength(), random);
+				} while (k.bitLength() == l - q.bitLength());
+				p = k.multiply(q).add(BigInteger.ONE);
+			} while (p.bitLength() == l);
+		} while (!p.isProbablePrime(100));
 		this.p = p;
 		System.out.println("#rounds needed to find p: " + i);
 
-//		calculate g
+//		calculate g with order q
 		BigInteger h;
-		BigInteger g = BigInteger.ONE;
-		BigInteger aux = p.subtract(BigInteger.ONE);
-		BigInteger pow = aux.divide(q);
+		BigInteger g;
 		do {
-			h = new BigInteger(p.bitLength(), random);
-			if (h.compareTo(BigInteger.ONE) == 1 && h.compareTo(p.subtract(BigInteger.ONE)) == -1) {
-				g = h.modPow(pow, p);
-			}
+			do {
+				h = new BigInteger(p.bitLength(), random);
+			} while (h.compareTo(BigInteger.ONE) != 1 && h.compareTo(p.subtract(BigInteger.ONE)) != -1);
+			g = h.modPow(k, p);
 		} while (g.compareTo(BigInteger.ONE) == 0);
 		this.g = g;
 
@@ -68,9 +86,8 @@ public class DSA {
 		return publicKey;
 	}
 
-	public BigInteger[] sign(String m) throws NoSuchAlgorithmException {
-		MessageDigest sha2= MessageDigest.getInstance("SHA-256");
-		BigInteger sha2hash = new BigInteger(sha2.digest(m.getBytes()));
+	public BigInteger[] sign(String m) {
+		BigInteger sha2hash = new BigInteger(this.messageDigest.digest(m.getBytes()));
 
 		Random random = new Random();
 		BigInteger s;
@@ -88,9 +105,8 @@ public class DSA {
 		return signature;
 	}
 
-	public boolean verify(String m, BigInteger[] signatur, BigInteger[] publicKey) throws NoSuchAlgorithmException {
-		MessageDigest sha2= MessageDigest.getInstance("SHA-256");
-		BigInteger sha2hash = new BigInteger(sha2.digest(m.getBytes()));
+	public boolean verify(String m, BigInteger[] signatur, BigInteger[] publicKey) {
+		BigInteger sha2hash = new BigInteger(this.messageDigest.digest(m.getBytes()));
 
 		BigInteger s1 = signatur[0];
 		BigInteger s2 = signatur[1];
