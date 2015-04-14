@@ -1,25 +1,25 @@
 package de.jojoob.dh;
 
 import java.math.BigInteger;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * Created by joo on 05.03.15.
  */
 public class DHHost {
-	Random random;
+	SecureRandom secureRandom;
 	private BigInteger p;
 	private BigInteger g;
 	private BigInteger a;
 	private BigInteger k;
 
 	public DHHost() {
-		this.random = new Random();
+		this.secureRandom = new SecureRandom();
 	}
 
-	public void generateGPrandom(int pLength) {
-		this.p = BigInteger.probablePrime(pLength, this.random);
-		this.g = new BigInteger(p.bitLength(), this.random).mod(p);
+	public void generateGPRandom(int pLength) {
+		this.p = BigInteger.probablePrime(pLength, this.secureRandom);
+		this.g = new BigInteger(p.bitLength(), this.secureRandom).mod(p);
 	}
 
 	/**
@@ -30,7 +30,7 @@ public class DHHost {
 	public void generateGPDSALike(int pLength, int qLength) {
 
 //		choose q (as subgroup order)
-		BigInteger q = BigInteger.probablePrime(qLength, random);
+		BigInteger q = BigInteger.probablePrime(qLength, secureRandom);
 
 //		calculate p with p = k * q + 1 // p - 1 | q
 		BigInteger p;
@@ -39,7 +39,7 @@ public class DHHost {
 		do {
 			do {
 				do {
-					k = new BigInteger(kLength, random);
+					k = new BigInteger(kLength, secureRandom);
 				} while (k.bitLength() == kLength);
 				p = k.multiply(q).add(BigInteger.ONE);
 			} while (p.bitLength() == pLength);
@@ -50,7 +50,7 @@ public class DHHost {
 		BigInteger h;
 		BigInteger g = BigInteger.ONE;
 		do {
-			h = new BigInteger(p.bitLength(), this.random);
+			h = new BigInteger(p.bitLength(), this.secureRandom);
 			if (h.compareTo(BigInteger.ONE) == 1 && h.compareTo(p.subtract(BigInteger.ONE)) == -1) {
 				g = h.modPow(k, p);
 			}
@@ -63,14 +63,14 @@ public class DHHost {
 		BigInteger u;
 		BigInteger p;
 		do {
-			u = BigInteger.probablePrime(pLength-1, this.random);
+			u = BigInteger.probablePrime(pLength - 1, this.secureRandom);
 			p = g.multiply(u).add(BigInteger.ONE);
 		} while (!p.isProbablePrime(100));
 		this.p = p;
 	}
 
 	public void generateA() {
-		this.a = new BigInteger(this.p.bitLength(), this.random).mod(p);
+		this.a = new BigInteger(this.p.bitLength(), this.secureRandom).mod(p);
 	}
 
 	public BigInteger getP() {
