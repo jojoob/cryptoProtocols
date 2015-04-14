@@ -3,9 +3,6 @@ package de.jojoob.dh;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-/**
- * Created by joo on 05.03.15.
- */
 public class DHHost {
 	SecureRandom secureRandom;
 	private BigInteger p;

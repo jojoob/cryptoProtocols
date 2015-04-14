@@ -6,9 +6,6 @@ import de.jojoob.clientserver.InputProcessor;
 import java.io.IOException;
 import java.math.BigInteger;
 
-/**
- * Created by joo on 05.03.15.
- */
 public class MainDHClient {
 	private static Client client;
 	private static DHHost dhClient;

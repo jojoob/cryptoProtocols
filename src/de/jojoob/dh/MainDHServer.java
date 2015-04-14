@@ -6,9 +6,6 @@ import de.jojoob.clientserver.Server;
 import java.io.IOException;
 import java.math.BigInteger;
 
-/**
- * Created by joo on 05.03.15.
- */
 public class MainDHServer {
 	private static Server server;
 	private static DHHost dhServer;
