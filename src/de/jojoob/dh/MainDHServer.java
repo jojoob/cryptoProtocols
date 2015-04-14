@@ -20,7 +20,7 @@ public class MainDHServer {
 		server.continuousRead(new ServerInputProcessor());
 
 		dhServer = new DHHost();
-//		dhServer.generateGPrandom(1024);
+//		dhServer.generateGPRandom(1024);
 //		dhServer.generateGPDSALike(1024, 256);
 		dhServer.generateGPsavePrime(1024);
 		dhServer.generateA();
@@ -38,6 +38,8 @@ public class MainDHServer {
 			BigInteger bigInteger = new BigInteger(input);
 
 			dhServer.setB(bigInteger);
+
+			dhServer.generateK();
 
 			System.out.println(dhServer.getK().toString(16));
 		}

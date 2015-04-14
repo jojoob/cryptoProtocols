@@ -46,6 +46,7 @@ public class MainDHClient {
 					break;
 				case 2:
 					dhClient.setB(bigInteger);
+					dhClient.generateK();
 					System.out.println(dhClient.getK().toString(16));
 					try {
 						client.close();
