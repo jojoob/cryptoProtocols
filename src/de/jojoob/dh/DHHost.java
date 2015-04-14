@@ -60,11 +60,11 @@ public class DHHost {
 
 	public void generateGPsavePrime(int pLength) {
 		this.g = new BigInteger("2");
-		BigInteger u;
+		BigInteger q;
 		BigInteger p;
 		do {
-			u = BigInteger.probablePrime(pLength - 1, this.secureRandom);
-			p = g.multiply(u).add(BigInteger.ONE);
+			q = BigInteger.probablePrime(pLength - 1, this.secureRandom);
+			p = g.multiply(q).add(BigInteger.ONE);
 		} while (!p.isProbablePrime(100));
 		this.p = p;
 	}
