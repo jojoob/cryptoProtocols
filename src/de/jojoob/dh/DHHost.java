@@ -11,6 +11,8 @@ public class DHHost {
 	private BigInteger p;
 	private BigInteger g;
 	private BigInteger a;
+	private BigInteger aA;
+	private BigInteger bB;
 	private BigInteger k;
 
 	public DHHost() {
@@ -69,8 +71,28 @@ public class DHHost {
 		this.p = p;
 	}
 
+	public void generateGPsavePrimeRoot(int pLength) {
+		this.g = new BigInteger("2");
+		BigInteger q;
+		BigInteger p;
+		do {
+			do {
+				q = BigInteger.probablePrime(pLength - 1, this.secureRandom);
+				p = g.multiply(q).add(BigInteger.ONE);
+			} while (!p.isProbablePrime(100));
+		} while (this.g.modPow(q, p).compareTo(BigInteger.ONE) == 0);
+		this.p = p;
+	}
+
 	public void generateA() {
-		this.a = new BigInteger(this.p.bitLength(), this.secureRandom).mod(p);
+		BigInteger a;
+		BigInteger aA;
+		do {
+			a = new BigInteger(this.p.bitLength(), this.secureRandom).mod(p);
+			aA = this.g.modPow(a, this.p);
+		} while (aA.compareTo(BigInteger.ONE) == 0 || aA.compareTo(a) == 0);
+		this.a = a;
+		this.aA = aA;
 	}
 
 	public BigInteger getP() {
@@ -90,14 +112,15 @@ public class DHHost {
 	}
 
 	public BigInteger getA() {
-		// Note: ga represents A
-		BigInteger ga = this.g.modPow(this.a, this.p);
-		return ga;
+		return this.aA;
 	}
 
-	// Note: gb represents B
-	public void setB(BigInteger gb) {
-		this.k = gb.modPow(this.a, this.p);
+	public void setB(BigInteger bB) {
+		this.bB = bB;
+	}
+
+	public void generateK() {
+		this.k = this.bB.modPow(this.a, this.p);
 	}
 
 	public BigInteger getK() {
