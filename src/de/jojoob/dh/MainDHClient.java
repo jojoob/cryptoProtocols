@@ -31,17 +31,33 @@ public class MainDHClient {
 			switch (state) {
 				case 0:
 					dhClient.setP(bigInteger);
+					state = 1;
 					break;
 				case 1:
 					dhClient.setG(bigInteger);
-					dhClient.generateA();
-					try {
-						client.writeLine(dhClient.getA().toString());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					state = 2;
 					break;
 				case 2:
+					dhClient.setQ(bigInteger);
+					if (dhClient.verifyQ(256)) {
+						System.out.println("Parameters OK");
+						dhClient.generateA();
+						try {
+							client.writeLine(dhClient.getA().toString());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else {
+						System.out.println("Parameters unsafe");
+						try {
+							client.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					state = 3;
+					break;
+				case 3:
 					dhClient.setB(bigInteger);
 					dhClient.generateK();
 					System.out.println(dhClient.getK().toString(16));
@@ -55,7 +71,6 @@ public class MainDHClient {
 					System.out.println("unkown state");
 					break;
 			}
-			state++;
 		}
 	}
 }

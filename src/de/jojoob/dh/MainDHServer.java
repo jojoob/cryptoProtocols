@@ -44,6 +44,7 @@ public class MainDHServer {
 
 		server.writeLine(dhServer.getP().toString());
 		server.writeLine(dhServer.getG().toString());
+		server.writeLine(dhServer.getQ().toString());
 		server.writeLine(dhServer.getA().toString());
 
 	}

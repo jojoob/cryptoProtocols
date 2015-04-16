@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 public class DHHost {
 	SecureRandom secureRandom;
 	private BigInteger p;
+	private BigInteger q;
 	private BigInteger g;
 	private BigInteger a;
 	private BigInteger aA;
@@ -29,18 +30,18 @@ public class DHHost {
 	public void generateGPDSALike(int pLength, int qLength) {
 
 //		choose q (as subgroup order)
-		BigInteger q = BigInteger.probablePrime(qLength, secureRandom);
+		this.q = BigInteger.probablePrime(qLength, secureRandom);
 
 //		calculate p with p = k * q + 1 // p - 1 | q
 		BigInteger p;
 		BigInteger k; // do not confuse with this.k
-		int kLength = pLength - q.bitLength();
+		int kLength = pLength - this.q.bitLength();
 		do {
 			do {
 				do {
 					k = new BigInteger(kLength, secureRandom);
 				} while (k.bitLength() == kLength);
-				p = k.multiply(q).add(BigInteger.ONE);
+				p = k.multiply(this.q).add(BigInteger.ONE);
 			} while (p.bitLength() == pLength);
 		} while (!p.isProbablePrime(100));
 		this.p = p;
@@ -66,19 +67,13 @@ public class DHHost {
 			p = g.multiply(q).add(BigInteger.ONE);
 		} while (!p.isProbablePrime(100));
 		this.p = p;
+		this.q = q;
 	}
 
 	public void generateGPsavePrimeRoot(int pLength) {
-		this.g = new BigInteger("2");
-		BigInteger q;
-		BigInteger p;
 		do {
-			do {
-				q = BigInteger.probablePrime(pLength - 1, this.secureRandom);
-				p = g.multiply(q).add(BigInteger.ONE);
-			} while (!p.isProbablePrime(100));
-		} while (this.g.modPow(q, p).compareTo(BigInteger.ONE) == 0);
-		this.p = p;
+			generateGPsavePrime(pLength);
+		} while (this.g.modPow(this.q, this.p).compareTo(BigInteger.ONE) == 0);
 	}
 
 	public void generateA() {
@@ -98,6 +93,39 @@ public class DHHost {
 
 	public BigInteger getG() {
 		return this.g;
+	}
+
+	public BigInteger getQ() {
+		if (this.q != null) {
+			return this.q;
+		} else {
+			if (this.g.compareTo(BigInteger.valueOf(2)) == 0) {
+				return this.p.subtract(BigInteger.ONE).divide(this.g);
+			}
+		}
+		return null;
+	}
+
+	public void setQ(BigInteger q) {
+		this.q = q;
+	}
+
+	public boolean verifyQ(int orderLength) {
+		if (this.g.modPow(this.g, this.p).compareTo(BigInteger.ONE) == 0) {
+			if (g.bitLength() < orderLength) {
+				return false;
+			}
+		}
+		if (this.g.modPow(this.q, this.p).compareTo(BigInteger.ONE) == 0) {
+			if (q.bitLength() < orderLength) {
+				return false;
+			}
+		} else {
+			if (2 * q.bitLength() < orderLength) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void setP(BigInteger p) {
