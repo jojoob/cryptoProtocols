@@ -80,7 +80,9 @@ public class DHHost {
 		BigInteger a;
 		BigInteger aA;
 		do {
-			a = new BigInteger(this.p.bitLength(), this.secureRandom).mod(p);
+			do {
+				a = new BigInteger(this.p.bitLength(), this.secureRandom).mod(p);
+			} while (a.bitLength() > Math.log(p.bitLength()) / Math.log(g.bitLength()));
 			aA = this.g.modPow(a, this.p);
 		} while (aA.compareTo(BigInteger.ONE) == 0 || aA.compareTo(a) == 0);
 		this.a = a;
