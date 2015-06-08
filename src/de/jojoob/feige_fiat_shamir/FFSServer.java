@@ -17,7 +17,7 @@ public class FFSServer {
 	/**
 	 * Rounds of Feige-Fiat-Shamir protocol within one interactive communication.
 	 */
-	public static int rounds = 100;
+	public static final int rounds = 100;
 
 	private static Server server;
 	private static int state = 0;
@@ -26,7 +26,7 @@ public class FFSServer {
 	private static final int READY = 100;
 	private static int count = 0;
 
-	private static SecureRandom rnd = new SecureRandom();
+	private static final SecureRandom rnd = new SecureRandom();
 
 	/**
 	 * public modulus

@@ -19,11 +19,11 @@ public class FFSClient {
 	 * Bit length of n
 	 */
 
-	public static int l = 4096;
+	public static final int l = 4096;
 	/**
 	 * Rounds of Feige-Fiat-Shamir protocol within one interactive communication.
 	 */
-	public static int rounds = 100;
+	public static final int rounds = 100;
 
 	private static Client client;
 	private static int state = 0;
@@ -31,7 +31,7 @@ public class FFSClient {
 	private static final int WAIT = 99;
 	private static final int READY = 100;
 
-	private static SecureRandom rnd = new SecureRandom();
+	private static final SecureRandom rnd = new SecureRandom();
 
 	/**
 	 * public modulus
